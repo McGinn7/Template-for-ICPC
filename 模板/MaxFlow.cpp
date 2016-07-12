@@ -1,10 +1,11 @@
 /**
  * N - 点数
+ * M - 边数
  */
 int et, dis[N], que[N], cur[N], head[N];
 struct Edge {
 	int s, t, v, nxt;
-} e[N * N];
+} e[M * 2];
 void addEdge(int s, int t, int v) {
 	e[et].s = s, e[et].t = t, e[et].v = v, e[et].nxt = head[s], head[s] = et++;
 	e[et].s = t, e[et].t = s, e[et].v = 0, e[et].nxt = head[t], head[t] = et++;
