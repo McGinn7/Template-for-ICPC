@@ -83,7 +83,7 @@ bool cmp(const Node &p, const Node &q) {
 	return sqr(p.x) + sqr(p.y) < sqr(q.x) + sqr(q.y);
 }
 void inc(int &x, int y) {
-	x += y;
+	x += y, x >= MOD && (x-=MOD);
 	if (x >= MOD)
 		x -= MOD;
 }
