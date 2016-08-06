@@ -18,8 +18,8 @@ struct MaxFlow {
 			b[i] = e[i];
 	}
 	void init(int _n) {
-		n = _n;
-		et = 0, memset(head, -1, sizeof(head[0]) * n);
+		n = _n, et = 0;
+		memset(head, -1, sizeof(head[0]) * n);
 	}
 	void addEdge(int s, int t, int v) {
 		e[et] = Edge(s, t, v, head[s]), head[s] = et++;

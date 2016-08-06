@@ -1,5 +1,6 @@
 vi e[N];
 struct BCC {
+	const static int N = 1e4 + 7;
 	vi bcc[N];
 	int n, cnt, top, sta[N], dfn[N], low[N];
 	void dfs(int u, int dep) {
@@ -13,8 +14,9 @@ struct BCC {
 				low[u] = min(low[u], low[v]);
 				if (low[v] >= dfn[u]) {
 					while (sta[--top] != v)
-						bcc[sta[top]].pb(cnt);
-					bcc[u].pb(cnt), bcc[v].pb(cnt++);
+						bcc[cnt].pb(sta[top]);
+					bcc[cnt].pb(u), bcc[cnt].pb(v);
+					++cnt;
 				}
 			} else if (dfn[v] != dfn[u] - 1 || src++) {
 				low[u] = min(low[u], dfn[v]);
@@ -22,11 +24,8 @@ struct BCC {
 		}
 	}
 	void run(int _n) {
-		n = _n;
-		cnt = top = 0;
-		memset(dfn, 0, sizeof(dfn[0]) * n);
-		memset(low, 0, sizeof(low[0]) * n);
-		fill_n(bcc, n, vi());
+		n = _n, cnt = top = 0;
+		fill_n(dfn, n, 0), fill_n(bcc, n, vi());
 		rep(i, 0, n)
 			if (!dfn[i])
 				dfs(i, 1);
