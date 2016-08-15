@@ -19,12 +19,11 @@ struct SCC {
 		dfn[u] = low[u] = ++tot;
 		for (int i = head[u]; ~i; i = e[i].nxt) {
 			int v = e[i].t;
-			if (dfn[v]) {
-				if (vis[v])
-					low[u] = min(low[u], dfn[v]);
-			} else {
+			if (!dfn[v]) {
 				dfs(v);
-				low[u] = min(low[u], low[v]);
+				low[u] = min(low[u], low[v]);				
+			} else if (vis[v]) {
+				low[u] = min(low[u], dfn[v]);
 			}
 		}
 		if (low[u] == dfn[u]) {
