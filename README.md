@@ -1,1 +1,1 @@
-# code for ACM ICPC
+# Code for ACM ICPC
