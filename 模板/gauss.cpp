@@ -1,6 +1,6 @@
 bool used[N];
 double x[N], a[N][N];
-int guass(int n, int m) {
+int gauss(int n, int m) {
 	int row, col;
 	for (row = col = 0; row < n && col < m; ++row, ++col) {
 		int mxr = row;
