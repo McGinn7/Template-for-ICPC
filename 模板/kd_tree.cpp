@@ -1,14 +1,14 @@
+const int N = 2e5 + 7;
 const int K = 2;
-int dim;
+int n, m, dim, c[N];
 struct Node {
 	int id, x[K];
-	void in(int _id) {
-		id = _id;
+	void in() {
 		rep(i, 0, K)
 			scanf("%d", &x[i]);
 	}
 	bool operator<(const Node &p) const {
-		return x[dim] < p.x[dim];
+		return x[dim] < p.x[dim];	
 	}
 } a[N];
 struct KdTree {
@@ -18,60 +18,63 @@ struct KdTree {
 	}
 	int build(int l, int r, int dep) {
 		if (l > r)
-			return 0;
+			return -1;
 		int t, m;
 		t = m = (l + r) >> 1, dim = dep % K;
 		nth_element(a + l, a + m, a + r + 1);
-		ch[t][0] = build(l, m - 1, dep + 1), ch[t][1] = build(m + 1, r, dep + 1);
+		ch[t][0] = build(l, m - 1, dep + 1);
+		ch[t][1] = build(m + 1, r, dep + 1);
 		rep(i, 0, K)
 			mn[t][i] = mx[t][i] = a[m].x[i];
-		rep(i, 0, 2)
-			rep(j, 0, K)
-				if (ch[t][i]) {
+		rep(i, 0, 2) 
+			if (~ch[t][i]) {
+				rep(j, 0, K) {
 					mn[t][j] = min(mn[t][j], mn[ch[t][i]][j]);
 					mx[t][j] = max(mx[t][j], mx[ch[t][i]][j]);
 				}
+			}
 		return t;
 	}
-	ll L;
-	int qid, aid, ax, ay;
+	ll dis, qc;
+	Node q, ans;
 	ll h(int t) {
-		if (!t)
-			return LINF;
+		if (t < 0)
+			return 1e18;
 		ll ret = 0;
-		rep(i, 0, K)
-		{
-			if (a[qid].x[i] < mn[t][i])
-				ret += sqr(mn[t][i] - a[qid].x[i]);
-			if (mx[t][i] < a[qid].x[i])
-				ret += sqr(a[qid].x[i] - mx[t][i]);
+		rep(i, 0, K) {
+			if (q.x[i] < mn[t][i])
+				ret += sqr(mn[t][i] - q.x[i]);
+			if (q.x[i] > mx[t][i])
+				ret += sqr(mx[t][i] - q.x[i]);
 		}
 		return ret;
 	}
-	void query(int l, int r, int dep) {
+	void upd(const Node &p) {
+		if (c[p.id] > qc) 
+			return ;
+		ll _dis = 0;
+		rep(i, 0, K)
+			_dis += sqr(p.x[i] - q.x[i]);
+		if (_dis < dis || (_dis == dis && p.id < ans.id))
+			dis = _dis, ans = p;
+	}
+	void qry(int l, int r, int dep) { // Remember Initialize: dis, q and so on
 		if (l > r)
-			return;
+			return ;
 		int t, m;
 		t = m = (l + r) >> 1;
-		if (m != qid) {
-			ll D = 0;
-			rep(i, 0, K)
-				D += sqr(a[qid].x[i] - a[m].x[i]);
-			if (D < L || (D == L && a[m].x[0] < ax)
-					|| (D == L && a[m].x[0] == ax && a[m].x[1] < ay))
-				L = D, ax = a[m].x[0], ay = a[m].x[1], aid = a[m].id;
-		}
+		upd(a[m]);
 		ll hl = h(ch[t][0]), hr = h(ch[t][1]);
 		if (hl < hr) {
-			if (hl <= L)
-				query(l, m - 1, dep + 1);
-			if (hr <= L)
-				query(m + 1, r, dep + 1);
+			if (hl <= dis)
+				qry(l, m - 1, dep + 1);
+			if (hr <= dis)
+				qry(m + 1, r, dep + 1);
 		} else {
-			if (hr <= L)
-				query(m + 1, r, dep + 1);
-			if (hl <= L)
-				query(l, m - 1, dep + 1);
+			if (hr <= dis)
+				qry(m + 1, r, dep + 1);
+			if (hl <= dis)
+				qry(l, m - 1, dep + 1);
 		}
 	}
 } kd;
