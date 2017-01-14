@@ -22,9 +22,9 @@ struct C {
 inline C conj(const C &p) {
 	return C(p.r, -p.i);
 }
-C w[N];
+C w[N], A[N], B[N], dfa[N], dfb[N], dfc[N], dfd[N];
 int L, bitrev[N];
-void init(int len) { // len = n + m
+void init(int len) {
 	L = 0;
 	while (1 << L <= len)
 		++L;
@@ -48,20 +48,17 @@ void fft(C a[], const int &n) {
 			}
 		}
 }
-int n, m, p;
-C A[N], B[N];
-C dfa[N], dfb[N], dfc[N], dfd[N];
-vector<int> gao(const vector<int> &a, const vector<int> &b, ll pw) {
+vector<int> gao(const vector<int> &a, const vector<int> &b) {
+	init(sz(a) + sz(b));
 	int n = 1 << L;
 	rep(i, 0, n)
 		A[i] = B[i] = C(0, 0);
-	rep(i, 0, m)
-		A[i * pw % m] = C(a[i] & 32767, a[i] >> 15);
-	rep(i, 0, m)
+	rep(i, 0, sz(a))
+		A[i] = C(a[i] & 32767, a[i] >> 15);
+	rep(i, 0, sz(b))
 		B[i] = C(b[i] & 32767, b[i] >> 15);
 	fft(A, n), fft(B, n);
-	rep(i, 0, n)
-	{
+	rep(i, 0, n) {
 		int j = (n - i) & (n - 1);
 		static C da, db, dc, dd;
 		da = (A[i] + conj(A[j])) * C(0.5, 0);
@@ -71,25 +68,23 @@ vector<int> gao(const vector<int> &a, const vector<int> &b, ll pw) {
 		dfa[j] = da * dc, dfb[j] = da * dd;
 		dfc[j] = db * dc, dfd[j] = db * dd;
 	}
-	rep(i, 0, n)
-	{
+	rep(i, 0, n) {
 		A[i] = dfa[i] + dfb[i] * C(0, 1);
 		B[i] = dfc[i] + dfd[i] * C(0, 1);
 	}
 	fft(A, n), fft(B, n);
-	vector<int> ret(m, 0);
-	rep(i, 0, n)
-	{
+	vector<int> ret(n, 0);
+	rep(i, 0, n) {
 		ll da = (ll) (A[i].r / n + 0.5) % MOD;
 		ll db = (ll) (A[i].i / n + 0.5) % MOD;
 		ll dc = (ll) (B[i].r / n + 0.5) % MOD;
 		ll dd = (ll) (B[i].i / n + 0.5) % MOD;
-		inc(ret[i % m], (da + ((db + dc) << 15) + (dd << 30)) % MOD);
+		inc(ret[i], (da + ((db + dc) << 15) + (dd << 30)) % MOD);
 	}
 	return ret;
 }
-//----------原始版本-------------
 
+//----------原始版本-------------
 struct C {
 	double r, i;
 	C() {
