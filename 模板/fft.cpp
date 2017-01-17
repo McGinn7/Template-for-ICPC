@@ -84,7 +84,61 @@ vector<int> gao(const vector<int> &a, const vector<int> &b) {
 	return ret;
 }
 
-//----------原始版本-------------
+//----------version 1.1-------------
+namespace FFT {
+	struct C {
+		double r, i;
+		C() {
+			r = i = 0;
+		}
+		C(double _r, double _i) {
+			r = _r, i = _i;
+		}
+		C operator+(const C &p) const {
+			return C(r + p.r, i + p.i);
+		}
+		C operator-(const C &p) const {
+			return C(r - p.r, i - p.i);
+		}
+		C operator*(const C &p) const {
+			return C(r * p.r - i * p.i, r * p.i + i * p.r);
+		}
+	};
+	void fft(vector<C> &x, int rev) {
+		int n = sz(x), i, j, k, t;
+		for (i = 1; i < n; ++i) {
+			for (j = 0, k = n >> 1, t = i; k; k >>= 1, t >>= 1)
+				j = (j << 1) | (t & 1);
+			if (i < j) swap(x[i], x[j]);
+		}
+		for (int s = 2, ds = 1; s <= n; ds = s, s <<= 1) {
+			C w = C(1, 0), t;
+			C wn = C(cos(2 * rev * PI / s), sin(2 * rev * PI / s));
+			for (k = 0; k < ds; ++k, w = w * wn)
+				for (i = k; i < n; i += s) {
+					t = w * x[i + ds];
+					x[i + ds] = x[i] - t;
+					x[i] = x[i] + t;
+				}
+		}
+		if (rev == -1)
+			for (i = 0; i < n; ++i) x[i].r /= n;
+	}
+	vector<int> mul(vector<int> &x, vector<int> &y) {
+		int L = 1;
+		while (L < sz(x) + sz(y)) L <<= 1;
+		vector<C> A(L), B(L);
+		rep(i, 0, sz(x)) A[i] = C(x[i], 0);
+		rep(i, 0, sz(y)) B[i] = C(y[i], 0);
+		fft(A, 1), fft(B, 1);
+		rep(i, 0, L) A[i] = A[i] * B[i];
+		fft(A, -1);
+		vector<int> ret(L);
+		rep(i, 0, L) ret[i] = (int) (A[i].r + 0.5);
+		return ret;
+	}
+}
+//----------version 1.0-------------
 struct C {
 	double r, i;
 	C() {
