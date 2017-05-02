@@ -4,8 +4,7 @@ import java.util.Scanner;
 import java.math.BigInteger;
 
 public class Main {
-	static final String file = "data";
-
+	
 	public static void main(String[] args) {
 		/**
 		 * 大数常用操作
@@ -17,15 +16,15 @@ public class Main {
 		try {
 			// 标准输入输出
 			in = new Scanner(System.in);
-			System.out.println("out content");
 			// 文件输入输出
-			in = new Scanner(new File(file + ".in"));
-			out = new PrintWriter(new File(file + ".out"));
+			in = new Scanner(new File("input.txt"));
+			out = new PrintWriter(new File("output.txt"));
+			// in.nextInt(), in.nextBigInteger() 
+			// System.out.println([String]), out.println([String])
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		/**
-		 * solve
+		 * note: must close file!
 		 */
 		in.close();
 		out.close();
