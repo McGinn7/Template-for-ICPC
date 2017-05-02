@@ -26,7 +26,6 @@ struct MinCost {
 		dis[S] = 0, vis[S] = true, que.push(S);
 		while (!que.empty()) {
 			int u = que.front();
-			assert(dis[u] >= 0);
 			for (int i = head[u]; ~i; i = e[i].nxt) {
 				int v = e[i].t;
 				if (e[i].cap > 0 && dis[v] > dis[u] + e[i].cost) {
