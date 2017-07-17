@@ -1,184 +1,127 @@
-#include<cstdio>
-#include<algorithm>
+#include<bits/stdc++.h>
 using namespace std;
-#define N 300007
-#define root1 ch[root][1]
-#define root10 ch[root1][0]
-int n,q;
-int a[N],b[N];
-int tot,root,query;
-int pre[N],val[N],size[N],ch[N][2],light[N];
-int gcd0[N],gcd1[N];
-int GCD(int a,int b){
-	if(b==0) return a;
-	int r=a%b;
-	while(r){
-		a=b,b=r,r=a%b;
-	}
-	return b;
-}
-void pushUp(int t){
-	if(t<=0) return ;
-	size[t]=1+size[ch[t][0]]+size[ch[t][1]];
-	gcd0[t]=GCD(gcd0[ch[t][0]],gcd0[ch[t][1]]);
-	gcd1[t]=GCD(gcd1[ch[t][0]],gcd1[ch[t][1]]);
-	if(light[t]){
-		gcd1[t]=GCD(val[t],gcd1[t]);
-	}
-	else{
-		gcd0[t]=GCD(val[t],gcd0[t]);
+typedef long long ll;
+#define fi first
+#define se second
+#define mp make_pair
+#define pb push_back
+#define sz(x) ((int)(x).size())
+#define all(x) (x).begin(),(x).end()
+#define rep(i,l,r) for(int i=(l);i<(r);++i)
+//-------
+const int N = 1e5 + 7;
+int n, m, q, a[N];
+struct Node {
+	int ch[2], p, v, sz, rev, add;
+	bitset<256> bit;
+} t[N];
+int rt;
+void inc(int x, int d) {
+	if (x) {
+		t[x].v = (t[x].v + d) & 255;
+		t[x].add = (t[x].add + d) & 255;	
+		t[x].bit = (t[x].bit << d) | (t[x].bit >> (256 - d));				
 	}
 }
-void pushDown(int t){
+void flip(int x) {
+	swap(t[x].ch[0], t[x].ch[1]), t[x].rev ^= 1;
 }
-void newNode(int &t,int value,int on_off,int father){
-	t=++tot;
-	size[t]=1;
-	val[t]=value;
-	pre[t]=father;
-	light[t]=on_off;
-	if(on_off){
-		gcd0[t]=0,gcd1[t]=value;
+void up(int x) {
+	t[x].sz = 1 + t[t[x].ch[0]].sz + t[t[x].ch[1]].sz;
+	t[x].bit = t[t[x].ch[0]].bit | t[t[x].ch[1]].bit;
+	t[x].bit[t[x].v] = 1;
+}
+void down(int x) {
+	if (t[x].add) {
+		inc(t[x].ch[0], t[x].add);
+		inc(t[x].ch[1], t[x].add);
+		t[x].add = 0;
 	}
-	else{
-		gcd0[t]=value,gcd1[t]=0;
+	if (t[x].rev) {
+		flip(t[x].ch[0]), flip(t[x].ch[1]);
+		t[x].rev = 0;
 	}
-	ch[t][0]=ch[t][1]=0;
 }
-void buildtree(int &t,int l,int r,int father){
-	if(l>r) return ;
-	int m=(l+r)>>1;
-	newNode(t,a[m],b[m],father);
-	buildtree(ch[t][0],l,m-1,t);
-	buildtree(ch[t][1],m+1,r,t);
-	pushUp(t);
+int build(int l, int r, int p) {
+	if (l > r) return 0;
+	int x = (l + r) >> 1;
+	t[x].v = a[x] & 255, t[x].p = p, t[x].rev = t[x].add = 0;
+	t[x].ch[0] = build(l, x - 1, x);
+	t[x].ch[1] = build(x + 1, r, x);
+	up(x);
+	return x;
 }
-void rotate(int x,int k){
-	int y=pre[x];
-	pushDown(y),pushDown(x);
-	ch[y][!k]=ch[x][k];
-	pre[ch[x][k]]=y;
-	if(pre[y]) ch[pre[y]][ch[pre[y]][1]==y]=x;
-	pre[x]=pre[y];
-	ch[x][k]=y;
-	pre[y]=x;
-	pushUp(y),pushUp(x);
+void rot(int x) {
+	int y = t[x].p;
+	down(y);
+	down(x);
+	if (rt == y) rt = x;
+	int f = t[y].ch[0] == x;
+	t[y].ch[!f] = t[x].ch[f];
+	if (t[x].ch[f]) t[t[x].ch[f]].p = y;
+	t[x].p = t[y].p;
+	if (t[y].p) t[t[y].p].ch[t[t[y].p].ch[1] == y] = x;
+	t[x].ch[f] = y;
+	t[y].p = x;
+	up(y);
 }
-void splay(int x,int goal){
-	pushDown(x);
-	int k;
-	while(pre[x]!=goal)
-	if(pre[pre[x]]==goal){
-		pushDown(pre[x]),pushDown(x);
-		rotate(x,ch[pre[x]][0]==x);
+void splay(int x, int g = 0) {
+	if (t[x].p == g) down(x);
+	else {
+		while (t[x].p != g) rot(x);
+		up(x);
 	}
-	else{
-		int y=pre[x];
-		pushDown(pre[y]),pushDown(y),pushDown(x);
-		k=(ch[pre[y]][0]==y);
-		if(ch[y][k]==x) rotate(x,!k); else rotate(y,k);
-		rotate(x,k);
+}
+void rto(int k, int g = 0) {
+	int x = rt;
+	while (true) {
+		down(x);
+		if (t[t[x].ch[0]].sz + 1 == k)
+			break;
+		if (k <= t[t[x].ch[0]].sz) {
+			x = t[x].ch[0];
+		} else {
+			k -= t[t[x].ch[0]].sz + 1;
+			x = t[x].ch[1];
+		}
 	}
-	pushUp(x);
-	if(goal==0) root=x;
+	splay(x, g);
 }
-int getMin(int t){
-	pushDown(t);
-	while(ch[t][0]){
-		t=ch[t][0];
-		pushDown(t);
-	}
-	return t;
-}
-int getRank(int t,int rank){
-	pushDown(t);
-	int s=size[ch[t][0]];
-	if(rank==1+s) return t;
-	if(rank<=s) return getRank(ch[t][0],rank);
-	return getRank(ch[t][1],rank-1-s);
-}
-void ins(int t,int value,int on_off){
-	int x=getRank(root,t);
-	if(ch[x][1]==0){
-		newNode(ch[x][1],value,on_off,x);
-	}
-	else{
-		x=getMin(ch[x][1]);
-		newNode(ch[x][0],value,on_off,x);
-	}
-	while(x){
-		pushUp(x);
-		x=pre[x];
-	}
-	++n;
-}
-void del(int k){
-	int x=getRank(root,k-1);
-	int y=getRank(root,k+1);
-	splay(x,0);
-	splay(y,root);
-	pre[root10]=0,root10=0;
-	pushUp(root1),pushUp(root);
-	splay(1,0);
-	--n;
-}
-char getChar(){
-	char CH=getchar();
-	while(CH!='Q' && CH!='I' && CH!='D' && CH!='R' && CH!='M') CH=getchar();
-	return CH;
-}
-int main(){
-	int i,l,r,x,y,ans,status;
-	while(scanf("%d%d",&n,&q)!=EOF){
-		tot=root=query=0;
-		for(i=1;i<=n;++i) scanf("%d%d",&a[i],&b[i]);
-		newNode(root,0,0,0);
-		newNode(root1,0,0,root);
-		buildtree(root10,1,n,root1);
-		pushUp(root1),pushUp(root);
-		while(q--){
-			char CH=getChar();
-			switch(CH){
-			case 'Q':
-				scanf("%d%d%d",&l,&r,&status);
-				x=getRank(root,l-1+1);
-				y=getRank(root,r+1+1);
-				splay(x,0);
-				splay(y,root);
-				if(status) ans=gcd1[root10];
-				else ans=gcd0[root10];
-				if(ans==0) ans=-1;
-				printf("%d\n",ans);
-				splay(1,0);
-				break;
-			case 'I':
-				scanf("%d%d%d",&x,&y,&status);
-				ins(x+1,y,status);
-				break;
-			case 'D':
-				scanf("%d",&x);
-				del(x+1);
-				break;
-			case 'R':
-				scanf("%d",&l);
-				x=getRank(root,l-1+1);
-				y=getRank(root,l+1+1);
-				splay(x,0);
-				splay(y,root);
-				light[root10]=1-light[root10];
-				pushUp(root10),pushUp(root1),pushUp(root);
-				splay(1,0);
-				break;
-			case 'M':
-				scanf("%d%d",&l,&r);
-				x=getRank(root,l-1+1);
-				y=getRank(root,l+1+1);
-				splay(x,0);
-				splay(y,root);
-				val[root10]=r;
-				pushUp(root10),pushUp(root1),pushUp(root);
-				splay(1,0);
-				break;
+#define key t[t[rt].ch[1]].ch[0]
+int main() {
+	int T;
+	scanf("%d", &T);
+	rep(cas, 0, T) {
+		scanf("%d%d%d", &n, &m, &q);
+		rep(i, 0, n) rep(j, 0, m) scanf("%d", &a[i * m + j + 2]);
+		rt = build(1, n * m + 2, 0);
+		rep(_q, 0, q) {
+			int op, k, l, r, z, L, R;
+			scanf("%d", &op);
+			if (op == 1) {
+				scanf("%d%d", &l, &r);
+				--l, --r;
+				L = R = l * m + r + 1;
+			} else {
+				scanf("%d%d%d", &k, &l, &r);
+				--k, --l, --r;
+				if (op == 3) {
+					scanf("%d", &z);
+					z &= 255;
+				}
+				L = 1 + k * m + l;
+				R = 1 + k * m + r;
+			}
+			rto(L);
+			rto(R + 2, rt);
+			if (op == 1) {
+				printf("%d\n", t[key].v);
+			} else if (op == 2) {
+				printf("%d\n", (int) t[key].bit.count());
+			} else if (op == 3) {
+				inc(key, z);
+			} else {
+				flip(key);
 			}
 		}
 	}
