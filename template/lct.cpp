@@ -1,3 +1,5 @@
+// remember initialize all values of node 0,
+// node 0 must not be used
 struct LCT {
 	bool rt[N], rev[N];
 	int n, fa[N], que[N], ch[N][2];
