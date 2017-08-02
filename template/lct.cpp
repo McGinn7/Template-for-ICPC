@@ -2,7 +2,6 @@ struct LCT {
 	bool rt[N], rev[N];
 	int n, fa[N], que[N], ch[N][2];
 	// custom information
-	int w[N], mx[N], add[N];
 	void init(int _n) {
 		n = _n;
 		rep(i, 0, n) {
@@ -13,17 +12,11 @@ struct LCT {
 	void reverse(int x) {
 		rev[x] = !rev[x], swap(ch[x][0], ch[x][1]);
 	}
-	void updweight(int x, int v) {
-		if (x) w[x] += v, mx[x] += v, add[x] += v;
-	}
 	void up(int x) {
-		mx[x] = max(w[x], max(mx[ch[x][0]], mx[ch[x][1]]));
 	}
 	void down(int x) {
 		if (rev[x])
 			rev[x] = 0, reverse(ch[x][0]), reverse(ch[x][1]);
-		if (add[x])
-			updweight(ch[x][0], add[x]), updweight(ch[x][1], add[x]), add[x] = 0;
 	}
 	void rotate(int x) {
 		int y = fa[x], k = (ch[y][0] == x);
