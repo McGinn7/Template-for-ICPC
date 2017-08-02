@@ -85,4 +85,12 @@ struct LCT {
 		// if y is father of x, can remove operation makeRoot(y)
 		makeRoot(y), cut(x);
 	}
+	void delNode(int x) {
+		splay(x);	
+		rep(i, 0, 2) {
+			if (!ch[x][i]) continue;
+			fa[ch[x][i]] = fa[x], rt[ch[x][i]] = true;
+			fa[x] = ch[x][i] = 0;
+		}
+	}
 } lct;
