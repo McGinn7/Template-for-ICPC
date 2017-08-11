@@ -1,4 +1,4 @@
-// 1.remember initialize all values of node 0, node 0 must not be used.
+// 1.remember initialize all values of node 0, and node 0 must not be used.
 // 2.before addEdge, weight of node should be initialized.
 // 3.update weight of one node x: splay(x), [update operation], up(x).
 struct LCT {
@@ -88,5 +88,5 @@ struct LCT {
 			fa[ch[x][i]] = fa[x], rt[ch[x][i]] = true;
 			fa[x] = ch[x][i] = 0;
 		}
-	}
+	}			
 } lct;
