@@ -53,5 +53,36 @@ struct Treap {
 		}
 		up(nt);
 	}
+	void rebuild(int &root) {
+		if (root == 0) return ;
+		static int timeStamp = 0;
+		static int que[M], ts[N], id[N];
+		static Node b[M];
+		int h = 0, t = 0;
+		++timeStamp;
+		++t, que[t] = root, id[root] = t, ts[root] = timeStamp, b[t] = a[root];
+		while (h < t) {
+			int u = que[++h];
+			if (a[u].ls) {
+				if (ts[a[u].ls] != timeStamp) {
+					id[a[u].ls] = ++t;
+					ts[a[u].ls] = timeStamp;
+					que[t] = a[u].ls, b[t] = a[a[u].ls];
+				}
+				b[h].ls = id[a[u].ls];
+			}
+			if (a[u].rs) {
+				if (ts[a[u].rs] != timeStamp) {
+					id[a[u].rs] = ++t;
+					ts[a[u].rs] = timeStamp;
+					que[t] = a[u].rs, b[t] = a[a[u].rs];
+				}
+				b[h].rs = id[a[u].rs];
+			}
+		}
+		tot = t;
+		rep(i, 1, tot + 1) a[i] = b[i];
+		root = id[root];
+	}
 } T;
 
