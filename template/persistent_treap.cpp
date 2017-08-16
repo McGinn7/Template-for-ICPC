@@ -3,14 +3,14 @@ struct Node {
 	void clr() {
 		ls = rs = 0, siz = 1;
 	}
-} a[N];
+} a[N], b[M];
 struct Treap {
-	int tot;
+	int tot, id[N], que[M];
 	void init() {
-		tot = 0, srand(time(0));
+		tot = 0, srand(time(NULL));
 	}
 	inline int _rand() {
-		return ((ll) rand() << 14) ^ ((ll) rand());
+		return (((ll) rand() << 14) ^ ((ll) rand()));
 	}
 	inline int newnode() {
 		++tot, a[tot].clr();
@@ -49,32 +49,27 @@ struct Treap {
 			split(a[t].ls, k, lt, a[nt].ls);
 		} else {
 			lt = nt;
-			split(a[t].rs, k - 1 - a[a[t].ls].siz, a[nt].rs, rt);	
+			split(a[t].rs, k - 1 - a[a[t].ls].siz, a[nt].rs, rt);
 		}
 		up(nt);
 	}
 	void rebuild(int &root) {
 		if (root == 0) return ;
-		static int timeStamp = 0;
-		static int que[M], ts[N], id[N];
-		static Node b[M];
+		memset(id, -1, sizeof(id));
 		int h = 0, t = 0;
-		++timeStamp;
-		++t, que[t] = root, id[root] = t, ts[root] = timeStamp, b[t] = a[root];
+		++t, que[t] = root, id[root] = t, b[t] = a[root];
 		while (h < t) {
 			int u = que[++h];
 			if (a[u].ls) {
-				if (ts[a[u].ls] != timeStamp) {
+				if (id[a[u].ls] == -1) {
 					id[a[u].ls] = ++t;
-					ts[a[u].ls] = timeStamp;
 					que[t] = a[u].ls, b[t] = a[a[u].ls];
 				}
 				b[h].ls = id[a[u].ls];
 			}
 			if (a[u].rs) {
-				if (ts[a[u].rs] != timeStamp) {
+				if (id[a[u].rs] == -1) {
 					id[a[u].rs] = ++t;
-					ts[a[u].rs] = timeStamp;
 					que[t] = a[u].rs, b[t] = a[a[u].rs];
 				}
 				b[h].rs = id[a[u].rs];
@@ -85,4 +80,3 @@ struct Treap {
 		root = id[root];
 	}
 } T;
-
