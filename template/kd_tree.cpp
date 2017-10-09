@@ -1,80 +1,131 @@
-const int N = 2e5 + 7;
-const int K = 2;
-int n, m, dim, c[N];
+const int N = 50000 + 10;
+const int D = 5;
+const double SCALE = 0.75;
+struct Point { int x[D]; } buf[N];
+int d, ctr;
+long long ret;
+int cmp(const Point &a, const Point &b) { return a.x[ctr] < b.x[ctr]; }
 struct Node {
-	int id, x[K];
-	void in() {
-		rep(i, 0, K)
-			scanf("%d", &x[i]);
+	int depth, size;
+	Node *ch[2], *p;
+	Point val, maxv, minv;
+	void set(Node *t, int d) { ch[d] = t; t->p = this; }
+	bool dir() { return this == p->ch[1]; }
+	bool balanced() {
+		return (double)max(ch[0]->size, ch[1]->size) <= (double)size * SCALE;
 	}
-	bool operator<(const Node &p) const {
-		return x[dim] < p.x[dim];	
+	void update() {
+		size = ch[0]->size + ch[1]->size + 1;
+		for(int i = 0; i < d; ++ i) {
+			maxv.x[i] = max(val.x[i], max(ch[0]->maxv.x[i], ch[1]->maxv.x[i]));
+			minv.x[i] = min(val.x[i], min(ch[0]->minv.x[i], ch[1]->minv.x[i]));
+		}
 	}
-} a[N];
-struct KdTree {
-	int ch[N][2], mn[N][K], mx[N][K];
-	inline ll sqr(ll x) {
-		return x * x;
-	}
-	int build(int l, int r, int dep) {
-		if (l > r)
-			return -1;
-		int t, m;
-		t = m = (l + r) >> 1, dim = dep % K;
-		nth_element(a + l, a + m, a + r + 1);
-		ch[t][0] = build(l, m - 1, dep + 1);
-		ch[t][1] = build(m + 1, r, dep + 1);
-		rep(i, 0, K)
-			mn[t][i] = mx[t][i] = a[m].x[i];
-		rep(i, 0, 2) 
-			if (~ch[t][i]) {
-				rep(j, 0, K) {
-					mn[t][j] = min(mn[t][j], mn[ch[t][i]][j]);
-					mx[t][j] = max(mx[t][j], mx[ch[t][i]][j]);
-				}
-			}
+} nodePool[N], *totNode, *null;
+Node* newNode(Point p, int depth) {
+	Node *t = totNode++;
+	t->size = 1;
+	t->depth = depth;
+	t->val = t->maxv = t->minv = p;
+	t->ch[0] = t->ch[1] = t->p = null;
+	return t;
+}
+struct KDTree {
+	Node *root;
+	Node *build(Point *a, int l, int r, int depth) {
+		if (l > r) return null;
+		ctr = depth;
+		sort(a + l, a + r + 1, cmp);
+		int mid = (l + r) >> 1;
+		Node *t = newNode(a[mid], depth);
+		t->set(build(a, l, mid - 1, (depth + 1) % d), 0);
+		t->set(build(a, mid + 1, r, (depth + 1) % d), 1);
+		t->update();
 		return t;
 	}
-	ll dis, qc;
-	Node q, ans;
-	ll h(int t) {
-		if (t < 0)
-			return 1e18;
-		ll ret = 0;
-		rep(i, 0, K) {
-			if (q.x[i] < mn[t][i])
-				ret += sqr(mn[t][i] - q.x[i]);
-			if (q.x[i] > mx[t][i])
-				ret += sqr(mx[t][i] - q.x[i]);
+	void tranverse(Node *t, Point *vec, int &tot) {
+		if (t == null) return;
+		vec[tot ++] = t->val;
+		tranverse(t->ch[0], vec, tot);
+		tranverse(t->ch[1], vec, tot);
+	}
+	void rebuild(Node *t) {
+		Node *p = t->p;
+		int tot = 0;
+		tranverse(t, buf, tot);
+		Node *u = build(buf, 0, tot - 1, t->depth);
+		p->set(u, t->dir());
+		for( ; p != null; p = p->p) p->update();
+		if (t == root) root = u;
+	}
+	void insert(Point p) {
+		if (root == null) { root = newNode(p, 0); return; }
+		Node *cur = root, *last = null;
+		int dir = 0;
+		for( ; cur != null; ) {
+			last = cur;
+			dir = (p.x[cur->depth] > cur->val.x[cur->depth]);
+			cur = cur->ch[dir];
 		}
-		return ret;
+		Node *t = newNode(p, (last->depth + 1) % d), *bad = null;
+		last->set(t, dir);
+		for( ; t != null; t = t->p) {
+			t->update();
+			if (!t->balanced()) bad = t;
+		}
+		if (bad != null) rebuild(bad);
 	}
-	void upd(const Node &p) {
-		if (c[p.id] > qc) 
-			return ;
-		ll _dis = 0;
-		rep(i, 0, K)
-			_dis += sqr(p.x[i] - q.x[i]);
-		if (_dis < dis || (_dis == dis && p.id < ans.id))
-			dis = _dis, ans = p;
+	long long calcEval(Point u, Node *t, int d) {
+		long long l = t->minv.x[d], r = t->maxv.x[d], x = u.x[d];
+		if (x >= l && x <= r) return 0LL;
+		long long ret = min(abs(x - l), abs(x - r));
+		return ret * ret;
 	}
-	void qry(int l, int r, int dep) { // Remember Initialize: dis, q and so on
-		if (l > r)
-			return ;
-		int t, m;
-		t = m = (l + r) >> 1;
-		upd(a[m]);
-		ll hl = h(ch[t][0]), hr = h(ch[t][1]);
-		if (hl < hr) {
-			if (hl <= dis)
-				qry(l, m - 1, dep + 1);
-			if (hr <= dis)
-				qry(m + 1, r, dep + 1);
+	
+	struct Cmp {
+		bool operator()(const pair<int, Point> &a, const pair<int, Point> &b) {
+			return a.fi < b.fi;	
+		}
+	};
+	// get the nearest MS points
+	int MS;
+	priority_queue<pair<int, Point>, vector<pair<int, Point> >, Cmp > ans;
+
+	void updateAns(Point u, Point p) {
+		int dis = 0;
+		rep(i, 0, K) dis += (u.x[i] - p.x[i]) * (u.x[i] - p.x[i]);
+		if (sz(ans) < MS) {
+			ans.push(mp(dis, u));
+		} else if (dis < ans.top().fi) {
+			ans.pop();
+			ans.push(mp(dis, u));
+		}
+	}
+	void query(Node *t, Point p) {
+		if (t == null) return;
+		updateAns(t->val, p);
+		long long evalLeft = calcEval(p, t->ch[0], t->depth);
+		long long evalRight = calcEval(p, t->ch[1], t->depth);	
+		if (evalLeft <= evalRight) {
+			query(t->ch[0], p);
+			if (sz(ans) < MS || ans.top().fi > evalRight) query(t->ch[1], p);
 		} else {
-			if (hr <= dis)
-				qry(m + 1, r, dep + 1);
-			if (hl <= dis)
-				qry(l, m - 1, dep + 1);
+			query(t->ch[1], p);
+			if (sz(ans) < MS || ans.top().fi > evalLeft) query(t->ch[0], p);
 		}
+	}
+	void query(Point p) {
+		query(root, p);
 	}
 } kd;
+void initNull(int _d) {
+	d = _d;
+	totNode = nodePool;
+	null = totNode ++;
+	null->size = 0;
+	for(int i = 0; i < d; ++ i) {
+		null->maxv.x[i] = -INF;
+		null->minv.x[i] = INF;
+	}
+}
+
