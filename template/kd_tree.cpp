@@ -1,9 +1,10 @@
-const int N = 50000 + 10;
-const int D = 5;
+const int N = 2e5 + 7;
+const int D = 2;
 const double SCALE = 0.75;
-struct Point { int x[D]; } buf[N];
+struct Point { 
+	int c, id, x[D]; 
+} buf[N];
 int d, ctr;
-long long ret;
 int cmp(const Point &a, const Point &b) { return a.x[ctr] < b.x[ctr]; }
 struct Node {
 	int depth, size;
@@ -21,9 +22,9 @@ struct Node {
 			minv.x[i] = min(val.x[i], min(ch[0]->minv.x[i], ch[1]->minv.x[i]));
 		}
 	}
-} nodePool[N], *totNode, *null;
+} pool[N], *cur, *null;
 Node* newNode(Point p, int depth) {
-	Node *t = totNode++;
+	Node *t = cur++;
 	t->size = 1;
 	t->depth = depth;
 	t->val = t->maxv = t->minv = p;
@@ -35,8 +36,8 @@ struct KDTree {
 	Node *build(Point *a, int l, int r, int depth) {
 		if (l > r) return null;
 		ctr = depth;
-		sort(a + l, a + r + 1, cmp);
 		int mid = (l + r) >> 1;
+		nth_element(a + l, a + mid, a + r + 1, cmp);
 		Node *t = newNode(a[mid], depth);
 		t->set(build(a, l, mid - 1, (depth + 1) % d), 0);
 		t->set(build(a, mid + 1, r, (depth + 1) % d), 1);
@@ -75,57 +76,36 @@ struct KDTree {
 		}
 		if (bad != null) rebuild(bad);
 	}
-	long long calcEval(Point u, Node *t, int d) {
-		long long l = t->minv.x[d], r = t->maxv.x[d], x = u.x[d];
+	ll calcEval(Point u, Node *t, int d) {
+		ll l = t->minv.x[d], r = t->maxv.x[d], x = u.x[d];
 		if (x >= l && x <= r) return 0LL;
-		long long ret = min(abs(x - l), abs(x - r));
+		ll ret = min(abs(x - l), abs(x - r));
 		return ret * ret;
 	}
-	
-	struct Cmp {
-		bool operator()(const pair<int, Point> &a, const pair<int, Point> &b) {
-			return a.fi < b.fi;	
-		}
-	};
-	// get the nearest MS points
-	int MS;
-	priority_queue<pair<int, Point>, vector<pair<int, Point> >, Cmp > ans;
-
+	Point R;	
+	pair<ll, int> ans;
 	void updateAns(Point u, Point p) {
-		int dis = 0;
-		rep(i, 0, K) dis += (u.x[i] - p.x[i]) * (u.x[i] - p.x[i]);
-		if (sz(ans) < MS) {
-			ans.push(mp(dis, u));
-		} else if (dis < ans.top().fi) {
-			ans.pop();
-			ans.push(mp(dis, u));
-		}
+		ll dis = 0;
+		rep(i, 0, d) dis += 1ll * (u.x[i] - p.x[i]) * (u.x[i] - p.x[i]);
+		if (u.c <= p.c && mp(dis, u.id) < ans) 
+			R = u, ans = mp(dis, u.id);
 	}
 	void query(Node *t, Point p) {
 		if (t == null) return;
 		updateAns(t->val, p);
-		long long evalLeft = calcEval(p, t->ch[0], t->depth);
-		long long evalRight = calcEval(p, t->ch[1], t->depth);	
+		ll evalLeft = calcEval(p, t->ch[0], t->depth);
+		ll evalRight = calcEval(p, t->ch[1], t->depth);	
 		if (evalLeft <= evalRight) {
-			query(t->ch[0], p);
-			if (sz(ans) < MS || ans.top().fi > evalRight) query(t->ch[1], p);
+			if (ans.fi > evalLeft)query(t->ch[0], p);
+			if (ans.fi > evalRight) query(t->ch[1], p);
 		} else {
-			query(t->ch[1], p);
-			if (sz(ans) < MS || ans.top().fi > evalLeft) query(t->ch[0], p);
+			if (ans.fi > evalRight) query(t->ch[1], p);
+			if (ans.fi > evalLeft) query(t->ch[0], p);
 		}
 	}
 	void query(Point p) {
+		ans = mp(1e18, INT_MAX);
 		query(root, p);
 	}
 } kd;
-void initNull(int _d) {
-	d = _d;
-	totNode = nodePool;
-	null = totNode ++;
-	null->size = 0;
-	for(int i = 0; i < d; ++ i) {
-		null->maxv.x[i] = -INF;
-		null->minv.x[i] = INF;
-	}
-}
 
