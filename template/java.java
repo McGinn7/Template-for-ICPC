@@ -12,7 +12,7 @@ public class Main {
 	*/
 
 	/**
-	 * 大数常用操作
+	 * Functions of BigInteger
 	 * add、subtract、multiply、divide、mod、pow、modPow
 	 * BigInteger[] divideAndRemainder(BigInteger val)
 	 * BigInteger modPow(BigInteger exponent, BigInteger m)
@@ -20,7 +20,7 @@ public class Main {
 	 */
 
 	/**
-	 * 大浮点数
+	 * Functions of BigDecimal
 	 * BigDecimal divide(BigDecimal divisor, int scale, RoundingMode roundingMode)
 	 * RoundingMode: ROUND_HALF_[DOWN|UP|EVEN], ROUND_FLOOR, ROUND_CEILING
 	 * BigDecimal negate(): return value is (-this)
@@ -30,10 +30,10 @@ public class Main {
 	Main() throws Exception {
 		Scanner in = null;
 		PrintWriter out = null;
-		// 标准输入输出
+		// standard input/output
 		in = new Scanner(System.in);
 		out = new PrintWriter(System.out);
-		// 文件输入输出
+		// file input/output
 		in = new Scanner(new File("input.txt"));
 		out = new PrintWriter(new File("output.txt"));
 		/**
