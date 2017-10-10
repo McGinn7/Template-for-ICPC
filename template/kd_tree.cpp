@@ -108,4 +108,14 @@ struct KDTree {
 		query(root, p);
 	}
 } kd;
+void initNull(int _d) {
+	d = _d;
+	totNode = nodePool;
+	null = totNode ++;
+	null->size = 0;
+	for(int i = 0; i < d; ++ i) {
+		null->maxv.x[i] = -INF;
+		null->minv.x[i] = INF;
+	}
+}
 
