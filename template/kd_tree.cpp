@@ -110,12 +110,12 @@ struct KDTree {
 } kd;
 void initNull(int _d) {
 	d = _d;
-	totNode = nodePool;
-	null = totNode ++;
+	cur = pool;
+	null = cur++;
 	null->size = 0;
 	for(int i = 0; i < d; ++ i) {
-		null->maxv.x[i] = -INF;
-		null->minv.x[i] = INF;
+		null->maxv.x[i] = -INT_MAX;
+		null->minv.x[i] = INT_MAX;
 	}
 }
 
