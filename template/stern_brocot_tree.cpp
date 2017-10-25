@@ -9,6 +9,7 @@
         In the remaining case, q = M; terminate the search algorithm.
 */
 namespace SBT {
+	const int INF = 1e9 + 7;
 	typedef __int128 T;
 	typedef pair<T, T> V; // V = [double|long double|fraction]
 	inline int cmp(const V &a, const V &b) {
@@ -26,10 +27,10 @@ namespace SBT {
 	}
 	void search(V v, int MAXB, pii &lo, pii &hi, int f) {
 		V x;
-		int l = 0, r = f > 0 ? (MAXB - lo.se) / hi.se : 
-			(MAXB - hi.se) / lo.se;
+		int l = 0, r = f > 0 ? (hi.se ? (MAXB - lo.se) / hi.se : INF) : 
+			(lo.se ? (MAXB - hi.se) / lo.se : INF);
 		while (l + 1 < r) {
-			int z = (l + r) >> 1;	
+			int z = (l + r) >> 1;
 			x = f > 0 ? lo + hi * z : lo * z + hi;
 			f * cmp(x, v) <= 0 ? l = z : r = z;
 		}
@@ -40,7 +41,7 @@ namespace SBT {
 	pii solve(V v, int MAXB) { // find ROUND_HALF_UP(a / b) = v, b <= MAXB
 		V L = mp(v.fi * 10 - 5, v.se * 10);	
 		V R = mp(v.fi * 10 + 5, v.se * 10);
-		pii lo(0, 1), hi(1, 1);
+		pii lo(0, 1), hi(1, 0);
 		while (true) {
 			V m = mp(lo.fi + hi.fi, lo.se + hi.se);	
 			if (in(L, R, m)) return mp(m.fi, m.se);
@@ -52,4 +53,3 @@ namespace SBT {
 		return mp(-1, -1);
 	}
 };
-
