@@ -7,7 +7,6 @@ A template library for personal programming competitions.
 ## TODO
 
 - [ ] 李超线段树（LC Segment Tree）
-- [ ] Splay Tree
 
 ## Simplified Tutorial
 
