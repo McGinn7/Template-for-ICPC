@@ -1,25 +1,18 @@
-void manacher(int n, int a[], int l[]) { // l[] length = 2 * n
-	l[0] = 1;
-	for (int i = 1, j = 0; i + 1 < n << 1; ++i) {
-		int p = i >> 1, q = i - p, r = (j + 1 >> 1) + l[j] - 1;
-		l[i] = r < q ? 0 : min(r - q + 1, l[(j << 1) - i]);
-		while (p - l[i] != -1 && q + l[i] != n && a[p - l[i]] == a[q + l[i]])
-			++l[i];
-		if (q + l[i] - 1 > r)
-			j = i;
+vector<int> manacher(const string &s) {
+	// make sure s.length() > 0 
+	// abcde → a#b#c#d#e
+	// s[i/2-L[i]+1, (i+1)/2+L[i]-1] is a palindrome
+	vector<int> L(2 * s.length() - 1);
+	L[0] = 1;
+	for (int i = 1, j = 0; i < L.size(); ++i) {
+		int p = i / 2;
+		int q = p + (i & 1);	
+		int r = (j + 1) / 2 + L[j] - 1; // rightmost
+		L[i] = q > r ? 0 : min(r - q + 1, L[2 * j - i]);	
+		while (p - L[i] >= 0 && q + L[i] < L.size()
+			&& s[p - L[i]] == s[q + L[i]])
+			++L[i];
+		if (q + L[i] - 1 > r) j = i;
 	}
+	return L;
 }
-//------------------------
-int p[N];
-void manacher(int n, char a[]) { // 1 ~ n, #a#b#d#a#
-	int id, mx = 0;
-	for (int i = 1; i <= n; ++i) {
-		p[i] = (mx > i ? min(mx - i, p[2 * id - i]) : 1);
-		while (i - p[i] >= 0 && i + p[i] <= n && a[i - p[i]] == a[i + p[i]])
-			++p[i];
-		if (i + p[i] > mx)
-			id = i, mx = i + p[i];
-	}
-}
-
-
