@@ -17,7 +17,7 @@ construct
 	(the remaining steps are the same as 无源汇上下界最大流)		
 result
 	1. there must be a feasible solution from SS to TT.
-	2. answer = maxflow(SS, TT)	+ maxflow(S, T) // don't chnage order
+	2. answer = maxflow(SS, TT) + maxflow(S, T) // don't chnage order
 
 有源汇上下界最小流
 define 
@@ -29,7 +29,7 @@ result
 	1. get maxflow(SS, TT)
 	2. addEdge(T, S, cap = INF)
 	3. get maxflow(SS, TT) again
-	4. if all S->i are full, there exits a solution and the answer 
+	4. if all SS->i are full, there exits a solution and the answer 
 	   equals to flow(S, T) now
 		
 最大权闭合子图
