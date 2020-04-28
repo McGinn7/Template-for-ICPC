@@ -4,17 +4,18 @@ A collection of algorithm templates verified by some problems, which is commonly
 
 - **DLX**
   - **Tags**: Algorithm X, Dancing links, Exact cover, Set cover, Sudoku
-  - **Solved problems**: POJ3074, POJ3740, ZOJ3209, FOJ1686, HDU2295, HDU3498
-
+  - **Solved problems**: POJ-3074, POJ-3740, ZOJ-3209, FOJ-1686, HDU-2295, HDU-3498
 - **Cartesian Tree**
   - **Time Complexity**: O(NlogN)
-  - **Solved problems**: SGU155(POJ2201)
-
+  - **Solved problems**: SGU-155(POJ-2201)
 - **Manacher**
   - **Tags**: Palindrome
   - **Time Complexity**: O(N)
-  - **Solved problems**: LEETCODE5
-
+  - **Solved problems**: LEETCODE-5
 - **有源汇上下界最小流**
   - **Tags**: network flow
-  - **Solved problems**: SGU 176
+  - **Solved problems**: SGU-176
+- **Triangle in Undirected Graph**
+  - **Time Complexity**: O(MlogM)
+  - **Solved problems**: LEETCODE-LCP16, LUOGU-P1989
+
