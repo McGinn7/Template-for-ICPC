@@ -13,9 +13,13 @@ A collection of algorithm templates verified by some problems, which is commonly
   - **Time Complexity**: O(N)
   - **Solved problems**: LEETCODE-5
 - **有源汇上下界最小流**
-  - **Tags**: network flow
+  - **Tags**: Network flow
   - **Solved problems**: SGU-176
 - **Triangle in Undirected Graph**
   - **Time Complexity**: O(MlogM)
   - **Solved problems**: LEETCODE-LCP16, LUOGU-P1989
+- **Kuhn-Munkres Algorithm**
+  - **Tags**: Bipartite graph, Perfect matching with maximum cost
+  - **Time Complexity**: O(N^3)
+  - **Solved problems**: SGU-206, LUOGU-P2499
 
