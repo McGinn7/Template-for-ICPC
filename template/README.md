@@ -2,6 +2,9 @@
 
 A collection of algorithm templates verified by some problems, which is commonly used in ICPC.
 
+- **Convex Hull**
+  - **Tags:** geometry
+  - **Solved problems:** SGU-277, CF-70D
 - **DLX**
   - **Tags**: Algorithm X, Dancing links, Exact cover, Set cover, Sudoku
   - **Solved problems**: POJ-3074, POJ-3740, ZOJ-3209, FOJ-1686, HDU-2295, HDU-3498
