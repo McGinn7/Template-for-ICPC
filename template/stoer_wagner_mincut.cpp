@@ -1,7 +1,11 @@
 const int N = 601;
 
-int n, m, w[N], g[N][N];
-bool vis[N], used[N];
+int n, m, f[N], w[N], g[N][N];
+bool vis[N];
+
+int get(int x) {
+	return x == f[x] ? x : f[x] = get(f[x]);
+}
 
 int argmax(int n, int *a, bool *v) {
 	pair<int, int> rec(INT_MIN, 0);
@@ -12,7 +16,7 @@ int argmax(int n, int *a, bool *v) {
 
 int min_cut_phase(int A, int &s, int &t) {
 	rep(i, 0, n) {
-		w[i] = 0, vis[i] = used[i];	
+		w[i] = 0, vis[i] = (i != get(i));	
 	}
 	rep(_, A, n) {
 		s = t;
@@ -24,7 +28,7 @@ int min_cut_phase(int A, int &s, int &t) {
 }
 
 void merge_nodes(int s, int t) {
-	used[t] = true;
+	f[get(t)] = get(s);
 	rep(i, 0, n) {
 		g[s][i] += g[t][i];
 		g[i][s] += g[i][t];
@@ -32,19 +36,20 @@ void merge_nodes(int s, int t) {
 }
 
 int stoer_wagner_mincut() {
-	scanf("%d%d", &n, &m);
-	rep(i, 0, m) {
-		int a, b, c; scanf("%d%d%d", &a, &b, &c);
-		--a, --b;
-		g[a][b] += c;
-		g[b][a] += c;
-	}
-	rep(i, 0, n) used[i] = false;
+	rep(i, 0, n) f[i] = i;
 
 	int ans = INT_MAX;
 	rep(i, 1, n) {
-		int s, t;	
-		ans = min(ans, min_cut_phase(i - 1, s, t));
+		int s, t, cut_of_the_phase;
+		cut_of_the_phase = min_cut_phase(i - 1, s, t);
+		if (cut_of_the_phase < ans) {
+			ans = cut_of_the_phase;
+			rep(j, 0, n) if (get(j) == get(t)) {
+				// A
+			} else {
+				// B
+			}
+		}
 		merge_nodes(s, t);
 	}
 	return ans;
