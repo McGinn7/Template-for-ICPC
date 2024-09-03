@@ -1,23 +1,28 @@
-# Code for ICPC
+经过部分题目验证的算法模板，常用于 ICPC。
 
-个人打程序设计竞赛的模板库。
+A collection of algorithm templates verified by some problems, which is commonly used in ICPC.
 
-A template library for personal programming competitions.
+- **Convex Hull**
+  - **Tags:** geometry
+  - **Solved problems:** SGU-277, CF-70D
+- **DLX**
+  - **Tags**: Algorithm X, Dancing links, Exact cover, Set cover, Sudoku
+  - **Solved problems**: POJ-3074, POJ-3740, ZOJ-3209, FOJ-1686, HDU-2295, HDU-3498
+- **Cartesian Tree**
+  - **Time Complexity**: O(NlogN)
+  - **Solved problems**: SGU-155(POJ-2201)
+- **Manacher**
+  - **Tags**: Palindrome
+  - **Time Complexity**: O(N)
+  - **Solved problems**: LEETCODE-5
+- **有源汇上下界最小流**
+  - **Tags**: Network flow
+  - **Solved problems**: SGU-176
+- **Triangle in Undirected Graph**
+  - **Time Complexity**: O(MlogM)
+  - **Solved problems**: LEETCODE-LCP16, LUOGU-P1989
+- **Kuhn-Munkres Algorithm**
+  - **Tags**: Bipartite graph, Perfect matching with maximum cost
+  - **Time Complexity**: O(N^3)
+  - **Solved problems**: SGU-206, LUOGU-P2499
 
-## TODO
-
-- [ ] 李超线段树（LC Segment Tree）
-
-## Simplified Tutorial
-
-个人的记录总结。
-
-- [x] [斜率优化](<https://mcginn7.github.io/2019/04/03/%E6%96%9C%E7%8E%87%E4%BC%98%E5%8C%96/>)（Convex Hull Optimisation）
-- [x] [KMP](<https://mcginn7.github.io/2019/05/24/Knuth-Morris-Pratt-Algorithm/>)（Knuth-Morris-Pratt Algorithm）
-- [x] [AC 自动机](<https://mcginn7.github.io/2019/05/31/AhoCorasick-Algorithm/>)（AhoCorasick Algorithm）
-
-## Note
-
-随缘更新。
-
-Irregular update.
