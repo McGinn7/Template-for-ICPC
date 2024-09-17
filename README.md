@@ -3,8 +3,8 @@
 A collection of algorithm templates verified by some problems, which is commonly used in ICPC.
 
 - **Suffix Tree**
-  - **Tags: ** string
-  - **Solved problems: ** LUOGU-P3804, CF-235C
+  - **Tags:** string
+  - **Solved problems:** LUOGU-P3804, CF-235C
 - **Convex Hull**
   - **Tags:** geometry
   - **Solved problems:** SGU-277, CF-70D
