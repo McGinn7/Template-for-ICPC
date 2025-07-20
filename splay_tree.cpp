@@ -1,56 +1,103 @@
-/**
- * @note initialize idx = 0 before use
- * @verified_by hdu1890(Robotic Sort) 
- */
-struct SplayTree {
-	/**
-	 * Fixed variables
-	 * @rev lazy tag denoting reverse subtree
-	 * @rt root of splay tree
-	 * @idx number of nodes created
-	 * @fa node's parent
-	 * @ch node's children
-	 * @size subtree size 
-	 */
-	bool rev[N];	
-	int rt, idx, fa[N], ch[N][2], size[N];
-	SplayTree() { idx = 0; }	
-	int newNode() {
-		size[++idx] = 1;
-		rev[idx] = false;
-		fa[idx] = ch[idx][0] = ch[idx][1] = 0;		
-		return idx;	
-	}
-	inline void flip(int x) {
-		rev[x] ^= 1, swap(ch[x][0], ch[x][1]);
-	}
-	inline void up(int x) {
-		size[x] = 1 + size[ch[x][0]] + size[ch[x][1]];
-	}
-	inline void down(int x) {
-		if (!rev[x]) return;
-		rev[x] = false, flip(ch[x][0]), flip(ch[x][1]);
-	}
-	/* rotate node x according to whether x is 
-	 * left or right child of its parent node. */
-	void rot(int x) {
-		int y = fa[x], k = ch[y][0] == x;
-		down(y);
+int val[N];
+int idx, fa[N], cc[N], sz[N], rev[N], ch[N][2];
+int new_node(int v, int _fa=0) {
+	int x = ++idx;
+	fa[x] = _fa, cc[x] = sz[x] = 1, rev[x] = ch[x][0] = ch[x][1] = 0;
+
+	val[x] = v;
+	return x;
+}
+inline void up(int x) {
+	sz[x] = cc[x] + sz[ch[x][0]] + sz[ch[x][1]];
+}
+inline void upd(int x) {
+	if (x) rev[x] ^= 1, swap(ch[x][0], ch[x][1]);
+}
+inline void down(int x) {
+//	if (x && rev[x]) rev[x] = 0, upd(ch[x][0]), upd(ch[x][1]);
+}
+inline int dir(int x) {
+	return x == ch[fa[x]][1];
+}
+inline void link(int f, int d, int s) {
+	if (f) down(f), ch[f][d] = s, up(f);
+	if (s) fa[s] = f;
+}
+void rotate(int x) {
+	int y = fa[x], z = fa[fa[x]], dx = dir(x), dy = dir(y);
+	link(y, dx, ch[x][!dx]);
+	link(x, !dx, y);
+	link(z, dy, x);
+}
+void splay(int &z, int x) {
+	for (int f = fa[z]; fa[x] != f; rotate(x))
+		if (fa[fa[x]] != f) rotate(dir(x) == dir(fa[x]) ? fa[x] : x);
+	z = x;
+}
+void find_insert(int &z, int v, int d=1) {
+	int x = z, y = fa[z];
+	while (x && val[x] != v) {
 		down(x);
-		ch[y][!k] = ch[x][k];
-		fa[ch[x][k]] = y, fa[x] = fa[y];
-		fa[ch[x][k] = y] = x;
-		if (rt == y) rt = x;
-		else ch[fa[x]][ch[fa[x]][1] == y] = x;
-		up(y);			
+		x = ch[y = x][v > val[x]];
 	}
-	void splay(int x, int f) {
-		while (fa[x] != f) {
-			int y = fa[x], z = fa[fa[x]];
-			if (z != f) 
-				rot((ch[z][1] == y) == (ch[y][1] == x) ? y : x);
-			rot(x);	
+	if (x) {
+		cc[x] += d, sz[x] += d;
+	} else if (d > 0) {
+		x = new_node(v, y);
+		link(y, v > val[y], x);
+	}
+	splay(z, x ? x : y);
+}
+void loc(int &z, int k) {
+	for (int x = z, l = ch[z][0]; k <= sz[x]; l = ch[x][0]) {
+		down(x);
+		if (k <= sz[l]) {
+			x = l;
+		} else if (k <= sz[l] + cc[x]) {
+			splay(z, x);
+			break;
+		} else {
+			k -= sz[l] + cc[x];
+			x = ch[x][1];
 		}
-		up(x);
-	}	
-};
+	}
+}
+int merge(int x, int y) {
+	if (!x || !y) return x | y;
+	loc(y, 1);
+	link(y, 0, x);
+	return y;
+}
+void remove(int &z, int v) {
+	find_insert(z, v, 0);
+	if (!z || val[z] != v) return ;
+	--cc[z], --sz[z];
+	if (cc[z] <= 0) {
+		int l = ch[z][0], r = ch[z][1];
+		fa[l] = fa[r] = 0;
+		z = merge(l, r);
+	}
+}
+///////////////////////////////////////////////////////
+int get_rank(int &z, int v) {
+	find_insert(z, v, 0);
+	return sz[ch[z][0]] + (val[z] < v ? cc[z] : 0) + 1;
+}
+int get_kth(int &z, int k) {
+	loc(z, k);
+	return val[z];
+}
+int get_prev(int &z, int v) {
+	find_insert(z, v, 0);
+	if (val[z] < v) return val[z];
+	if (!ch[z][0]) return INT_MIN;
+	loc(z, sz[ch[z][0]]);
+	return val[z];
+}
+int get_next(int &z, int v) {
+	find_insert(z, v, 0);
+	if (val[z] > v) return val[z];
+	if (!ch[z][1]) return INT_MAX;
+	loc(z, sz[ch[z][0]] + cc[z] + 1);
+	return val[z];
+}
